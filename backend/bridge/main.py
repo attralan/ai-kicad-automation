@@ -1,26 +1,13 @@
+from pathlib import Path
+
 from fastapi import FastAPI
-
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import FileResponse, JSONResponse
 
 from bridge.models import GenerateRequest
-
 from bridge.mcp_client import call_tool
 
-
-
-# Create FastAPI app
-
-app = FastAPI(
-    title="AI KiCad Copilot API",
-    version="1.0.0"
-)
-
-
-
-# ==========================
-# CORS CONFIGURATION
-# ==========================
+app = FastAPI()
 
 app.add_middleware(
 
@@ -28,87 +15,90 @@ app.add_middleware(
 
     allow_origins=["*"],
 
-    allow_credentials=False,
+    allow_credentials=True,
 
     allow_methods=["*"],
 
-    allow_headers=["*"],
-
+    allow_headers=["*"]
 )
 
+# Same folder create_project()/create_schematic() write into — kept in one
+# place so the download route always looks in exactly the right spot.
+GENERATED_DIR = Path(__file__).resolve().parents[2] / "generated_files"
 
-
-# ==========================
-# HEALTH CHECK
-# ==========================
 
 @app.get("/")
 def home():
 
     return {
 
-        "status": "running",
-
-        "message": "AI KiCad Copilot Backend"
+        "status":
+        "AI KiCad Copilot Running"
 
     }
 
-
-
-# ==========================
-# GENERATE PROJECT API
-# ==========================
 
 @app.post("/api/generate")
 async def generate(
 
     request: GenerateRequest
-
 ):
 
+    project_name = "demo_board"
 
-    result = await call_tool(
+    pcb_result = await call_tool(
 
         "create_kicad_project",
 
         {
 
             "project_name":
-
-            "demo_board"
+            project_name
 
         }
 
     )
 
+    sch_result = await call_tool(
+
+        "create_kicad_schematic",
+
+        {
+
+            "project_name":
+            project_name
+
+        }
+
+    )
 
     return {
 
         "prompt":
-
         request.prompt,
 
-
         "message":
-
         "KiCad project generated",
 
+        "project_name":
+        project_name,
 
-        "result":
+        "files":
+        [
+            f"{project_name}.kicad_pcb",
+            f"{project_name}.kicad_sch"
+        ],
 
-        str(result)
+        "pcb_result":
+        pcb_result.content[0].text,
 
+        "schematic_result":
+        sch_result.content[0].text
     }
 
 
-
-# ==========================
-# TEST MCP TOOL
-# ==========================
-
 @app.post("/api/header")
-async def create_header():
-
+async def header():
 
     result = await call_tool(
 
@@ -128,16 +118,27 @@ async def create_header():
 
     )
 
-
     return {
 
-        "message":
-
-        "Header placement generated",
-
-
         "result":
-
-        str(result)
+        result.content[0].text
 
     }
+
+
+@app.get("/api/download/{project_name}/{filename}")
+async def download_file(project_name: str, filename: str):
+
+    file_path = GENERATED_DIR / project_name / filename
+
+    if not file_path.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"error": "File not found"}
+        )
+
+    return FileResponse(
+        path=file_path,
+        filename=filename,
+        media_type="application/octet-stream"
+    )

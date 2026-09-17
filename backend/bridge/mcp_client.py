@@ -8,44 +8,49 @@ from mcp.client.stdio import (
     StdioServerParameters
 )
 
-
+from bridge.security import check_tool
 
 BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
-
-
-SERVER_PATH = os.path.abspath(
-    os.path.join(
-        BASE_DIR,
-        "..",
-        "kicad_mcp_server",
-        "server.py"
+    os.path.dirname(
+        os.path.abspath(__file__)
     )
 )
 
 
-
 async def call_tool(
+
     tool_name,
+
     arguments
 ):
 
+    check_tool(tool_name)
 
     params = StdioServerParameters(
 
         command=sys.executable,
 
         args=[
-            SERVER_PATH
+
+            "-m",
+
+            "kicad_mcp_server.server"
+
         ],
 
+        cwd=BASE_DIR,
+
         env={
+
             **os.environ
+
         }
 
     )
 
+    print(
+        "Starting MCP package server..."
+    )
 
     async with stdio_client(params) as (
 
@@ -55,7 +60,6 @@ async def call_tool(
 
     ):
 
-
         async with ClientSession(
 
             read,
@@ -64,9 +68,16 @@ async def call_tool(
 
         ) as session:
 
+            print(
+                "Initializing MCP..."
+            )
 
             await session.initialize()
 
+            print(
+                "Calling tool:",
+                tool_name
+            )
 
             result = await session.call_tool(
 
@@ -75,6 +86,5 @@ async def call_tool(
                 arguments
 
             )
-
 
             return result

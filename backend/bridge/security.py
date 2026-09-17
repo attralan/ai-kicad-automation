@@ -1,23 +1,15 @@
 ALLOWED_TOOLS = [
-
     "create_kicad_project",
 
-    "place_header"
+    "create_kicad_schematic",
 
+    "place_header"
 ]
 
 
-
-def validate_tool(
-    name
-):
-
-
+def check_tool(name):
     if name not in ALLOWED_TOOLS:
 
-        raise PermissionError(
-            "Tool blocked"
+        raise Exception(
+            "Tool not allowed"
         )
-
-
-    return True
