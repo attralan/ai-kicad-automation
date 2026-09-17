@@ -1,34 +1,22 @@
-import sys
-
 from mcp.server.fastmcp import FastMCP
 
-from tools import register_tools
+from kicad_mcp_server.tools import register_tools
 
-
-mcp = FastMCP(
-    "AI-KiCad-Copilot"
+print(
+    "MCP SERVER LOADED"
 )
 
+mcp = FastMCP(
+    "AI KiCad MCP Server"
+)
 
 register_tools(mcp)
 
-
 print(
-    "MCP SERVER LOADED",
-    file=sys.stderr,
-    flush=True
+    "MCP SERVER STARTING"
 )
 
-
 if __name__ == "__main__":
-
-    print(
-        "MCP SERVER STARTING",
-        file=sys.stderr,
-        flush=True
-    )
-
-
     mcp.run(
         transport="stdio"
     )

@@ -1,92 +1,112 @@
-import { useState } from "react";
+import {useState} from "react";
 
-import { generate } from "./api";
+import {generate, downloadUrl} from "./api";
 
+function App(){
 
-function App() {
+  const [prompt,setPrompt]=useState("");
 
+  const [result,setResult]=useState("");
 
-    const [prompt, setPrompt] = useState("");
+  const [files,setFiles]=useState([]);
 
-    const [result, setResult] = useState("");
+  const [projectName,setProjectName]=useState("");
 
+  async function run(){
 
+    const data =
+      await generate(prompt);
 
-    async function handleGenerate() {
+    setResult(
 
+      JSON.stringify(
 
-        const data = await generate(prompt);
+        data,
 
+        null,
 
-        setResult(
-            JSON.stringify(
-                data,
-                null,
-                2
-            )
-        );
+        2
 
-    }
-
-
-
-    return (
-
-        <div style={{padding:"40px"}}>
-
-
-            <h1>
-                AI KiCad Copilot
-            </h1>
-
-
-            <textarea
-
-                rows="6"
-
-                cols="50"
-
-                placeholder="Example: Create a PCB project"
-
-                value={prompt}
-
-                onChange={
-                    e => setPrompt(e.target.value)
-                }
-
-            />
-
-
-            <br/>
-
-
-            <button
-                onClick={handleGenerate}
-            >
-
-                Generate KiCad Project
-
-            </button>
-
-
-
-            <h3>
-                Result
-            </h3>
-
-
-            <pre>
-
-                {result}
-
-            </pre>
-
-
-        </div>
+      )
 
     );
 
-}
+    setFiles(data.files || []);
 
+    setProjectName(data.project_name || "");
+
+  }
+
+  return (
+
+    <div>
+
+      <h1>
+        AI KiCad Copilot
+      </h1>
+
+      <textarea
+
+        value={prompt}
+
+        onChange={
+
+          e=>setPrompt(e.target.value)
+
+        }
+
+      />
+
+      <button
+
+        onClick={run}
+
+      >
+
+        Generate KiCad Project
+
+      </button>
+
+      {files.length > 0 && (
+
+        <div>
+
+          <h3>Generated Files</h3>
+
+          <ul>
+
+            {files.map((f) => (
+
+              <li key={f}>
+
+                {f}{" "}
+
+                <a href={downloadUrl(projectName, f)} download>
+
+                  Download
+
+                </a>
+
+              </li>
+
+            ))}
+
+          </ul>
+
+        </div>
+
+      )}
+
+      <pre>
+
+        {result}
+
+      </pre>
+
+    </div>
+
+  )
+
+}
 
 export default App;

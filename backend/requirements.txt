@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-mcp
+mcp<2
 pydantic
 pytest
 python-dotenv
