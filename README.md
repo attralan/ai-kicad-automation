@@ -1,25 +1,10 @@
-
-
 # AI KiCad Automation 🚀
 
 An AI-powered PCB automation assistant built using **Model Context Protocol (MCP)**.
 
-This project is a learning and portfolio prototype that demonstrates how Artificial Intelligence can communicate with external engineering tools through MCP.
+This project demonstrates how Artificial Intelligence can communicate with engineering tools through MCP and automate KiCad design workflows.
 
-The goal is to create an AI PCB Engineer that can understand natural language instructions and automatically perform PCB design tasks in KiCad.
-
-Example:
-
-```
-User:
-"Create a PCB project"
-
-AI:
-→ Understand request
-→ Call MCP tool
-→ Generate KiCad project
-→ Create PCB file
-```
+The goal is to build an AI PCB Engineer that can understand human instructions and convert them into structured KiCad automation commands.
 
 ---
 
@@ -27,34 +12,33 @@ AI:
 
 Traditional PCB design requires engineers to manually:
 
-* Open KiCad
-* Create projects
-* Select components
-* Place footprints
-* Configure board settings
-* Modify files
+- Create KiCad projects
+- Draw schematics
+- Select components
+- Place footprints
+- Configure PCB files
 
-This project explores a future workflow:
+This project explores an AI-assisted workflow:
 
 ```
 Human Instruction
-        |
+
         ↓
-       AI Assistant
-        |
+
+AI Assistant
+
         ↓
-   MCP Communication
-        |
+
+MCP Communication
+
         ↓
-  KiCad Automation Tools
-        |
+
+KiCad Automation Tools
+
         ↓
-  Generated PCB Files
+
+Generated PCB Files
 ```
-
-The AI does not directly control KiCad.
-
-Instead, it uses **MCP tools** as a safe communication layer between the AI system and engineering software.
 
 ---
 
@@ -76,70 +60,80 @@ Instead, it uses **MCP tools** as a safe communication layer between the AI syst
                   |
                   ↓
 
-             MCP Client
+              MCP Client
 
                   |
                   ↓
 
-        Model Context Protocol
+       Model Context Protocol
 
                   |
                   ↓
 
-          Custom KiCad MCP Server
+        Custom KiCad MCP Server
 
                   |
-                  ↓
+        -------------------------
 
-          KiCad File Generator
+        |                       |
 
-                  |
-                  ↓
+        ↓                       ↓
 
-          .kicad_pcb File
+  KiCad PCB Generator     Schematic Generator
+
+        |                       |
+
+        ↓                       ↓
+
+   .kicad_pcb             .kicad_sch
+
 ```
 
 ---
 
 # 🔥 What is MCP?
 
-**Model Context Protocol (MCP)** is a communication standard that allows AI models to interact with external tools and applications.
+**Model Context Protocol (MCP)** is a communication standard that allows AI systems to interact with external tools.
 
-Think of MCP like a universal connector.
-
-Example:
+MCP works as a bridge between AI models and engineering applications.
 
 Without MCP:
 
 ```
 AI
- |
- X
- |
-KiCad
-```
 
-AI cannot safely access KiCad.
+ |
+
+X
+
+ |
+
+Engineering Tool
+```
 
 With MCP:
 
 ```
 AI
- |
- MCP
- |
-Tool
- |
-KiCad
-```
 
-The AI can request actions through defined tools.
+ |
+
+MCP
+
+ |
+
+Tool
+
+ |
+
+Engineering Software
+```
 
 ---
 
-# ✨ Current Features (Version 1.0)
+# ✨ Current Features (Version 1.1)
 
-## ✅ Custom MCP Server
+## ✅ Custom KiCad MCP Server
 
 A dedicated MCP server created for KiCad automation.
 
@@ -151,11 +145,9 @@ backend/kicad_mcp_server/
 
 ---
 
-## ✅ MCP Tools
+# 🛠 MCP Tools
 
-Currently available tools:
-
-### 1. Create KiCad Project
+## 1. Create KiCad Project
 
 Tool:
 
@@ -171,7 +163,7 @@ Example:
 }
 ```
 
-Creates:
+Generates:
 
 ```
 demo_board.kicad_pcb
@@ -179,7 +171,23 @@ demo_board.kicad_pcb
 
 ---
 
-### 2. Place Header Component
+## 2. Create KiCad Schematic
+
+Tool:
+
+```
+create_kicad_schematic()
+```
+
+Generates:
+
+```
+demo_board.kicad_sch
+```
+
+---
+
+## 3. Place Header Component
 
 Tool:
 
@@ -198,141 +206,124 @@ Example:
 }
 ```
 
-This represents a PCB component placement instruction.
+Creates a component placement instruction.
 
 ---
 
-# 🛠️ Technologies Used
+# 🌐 Web Interface
 
-## Backend
+The project includes a React + Vite frontend.
 
-* Python
-* FastAPI
-* Model Context Protocol (MCP)
-* Pydantic
+Features:
 
-## Frontend
+✅ Prompt input box
 
-* React
-* Vite
-* JavaScript
+✅ Generate KiCad project button
 
-## PCB Automation
+✅ Backend communication
 
-* KiCad PCB format
-* Custom PCB generator
+✅ Generated file display
+
+✅ Download PCB file
+
+✅ Download schematic file
+
+---
+
+# ⚙️ Backend
+
+Built using:
+
+- Python
+- FastAPI
+- MCP SDK
+- Pydantic
+
+
+API Flow:
+
+```
+React
+
+ ↓
+
+FastAPI
+
+ ↓
+
+MCP Client
+
+ ↓
+
+KiCad MCP Server
+
+ ↓
+
+Generated Files
+```
 
 ---
 
 # 📂 Project Structure
 
 ```
-ai-kicad-copilot/
+ai-kicad-automation/
 
 │
 ├── frontend/
-│   └── React Web Interface
+│
+│   ├── src/
+│   │
+│   ├── App.jsx
+│   └── api.js
+│
 │
 ├── backend/
 │
 │   ├── bridge/
-│   │   ├── FastAPI server
-│   │   └── MCP client
+│   │
+│   │   ├── main.py
+│   │   ├── mcp_client.py
+│   │   ├── models.py
+│   │   └── security.py
+│
 │
 │   ├── kicad_mcp_server/
-│   │   ├── MCP server
-│   │   ├── Tool definitions
-│   │   └── PCB generator
+│   │
+│   │   ├── server.py
+│   │   ├── tools.py
+│   │   ├── pcb_writer.py
+│   │   └── kicad_generator.py
 │
-│   └── kicad/
-│       └── Generated files
 │
-└── tests/
+├── README.md
+│
+└── requirements.txt
+
 ```
 
 ---
 
-# 🚀 How It Works
-
-Example workflow:
-
-### Step 1
-
-User enters:
-
-```
-Create a PCB project
-```
-
----
-
-### Step 2
-
-React sends request:
-
-```
-Browser
- ↓
-FastAPI API
-```
-
----
-
-### Step 3
-
-FastAPI calls MCP Client:
-
-```
-MCP Client
- ↓
-create_kicad_project()
-```
-
----
-
-### Step 4
-
-MCP Server executes tool:
-
-```
-KiCad MCP Server
- ↓
-PCB Generator
-```
-
----
-
-### Step 5
-
-Output:
-
-```
-demo_board.kicad_pcb
-```
-
-is generated.
-
----
-
-# 🧑‍💻 Beginner Setup
+# 🚀 Installation
 
 ## Requirements
 
 Install:
 
-* Python 3.10+
-* Node.js
-* KiCad
-* Git
+- Python 3.10+
+- Node.js
+- Git
+- KiCad
+
 
 ---
 
-## Backend Setup
+# Backend Setup
 
-Go to:
+Go to backend:
 
-```
-backend
+```bash
+cd backend
 ```
 
 Create virtual environment:
@@ -355,20 +346,26 @@ Install packages:
 pip install -r requirements.txt
 ```
 
-Run server:
+Run backend:
 
 ```bash
 uvicorn bridge.main:app --port 8787
 ```
 
----
-
-## Frontend Setup
-
-Go to:
+Backend runs:
 
 ```
-frontend
+http://127.0.0.1:8787
+```
+
+---
+
+# Frontend Setup
+
+Go to frontend:
+
+```bash
+cd frontend
 ```
 
 Install dependencies:
@@ -399,67 +396,185 @@ Run:
 python test_client.py
 ```
 
-Expected:
+Expected output:
 
 ```
 before init
+
 after init
 
 Available tools:
 
 - create_kicad_project
+- create_kicad_schematic
 - place_header
+
+```
+
+---
+
+# Example Workflow
+
+User enters:
+
+```
+Create a PCB project
+```
+
+System performs:
+
+```
+React UI
+
+ ↓
+
+FastAPI Request
+
+ ↓
+
+MCP Client
+
+ ↓
+
+create_kicad_project()
+
+ ↓
+
+KiCad Generator
+
+ ↓
+
+demo_board.kicad_pcb
+
+demo_board.kicad_sch
+
 ```
 
 ---
 
 # 🗺️ Roadmap
 
-## Version 1.1
 
-Real PCB component generation:
+# Version 1.2
 
-* Real KiCad footprints
-* Component placement
-* Modify existing PCB files
+AI Planning Layer
 
-## Version 1.2
+Features:
 
-AI Understanding Layer:
+- Natural language understanding
+- Prompt to MCP tool conversion
+- AI decision making
 
-* Natural language PCB commands
-* Prompt parsing
-* AI planning
 
-## Version 2.0
+Example:
 
-Advanced PCB Engineer:
+User:
 
-* Automatic routing
-* Design rule checking
-* Component suggestions
-* Complete PCB generation
+```
+Create a temperature sensor board
+```
+
+AI:
+
+```
+create_project()
+
+add_ESP32()
+
+add_sensor()
+
+place_components()
+
+generate_files()
+```
+
+
+---
+
+# Version 2.0
+
+Advanced AI PCB Engineer
+
+Planned:
+
+- Real KiCad footprints
+- Real schematic components
+- Automatic routing
+- Design rule checking
+- Component recommendation
+- Complete PCB generation
 
 ---
 
 # 🎯 Project Goal
 
-This project is an exploration of how AI agents can become engineering assistants.
+The long-term vision is an AI engineering assistant.
 
-The long-term vision:
+Example:
+
+Human:
 
 ```
-Engineer:
-"Design a sensor board with ESP32 and temperature sensor"
+Design an ESP32 temperature monitoring board
+```
 
 AI:
+
+```
 → Select components
+
 → Create schematic
+
 → Place footprints
+
 → Route PCB
+
 → Generate KiCad files
+
 ```
 
 ---
 
+# 📌 Version History
 
+
+## v1.1
+
+Added:
+
+✅ PCB generation
+
+✅ Schematic generation
+
+✅ MCP tool system
+
+✅ React web interface
+
+✅ FastAPI bridge
+
+✅ File download workflow
+
+
+## v1.0
+
+Initial prototype:
+
+✅ MCP server
+
+✅ MCP client
+
+✅ Basic KiCad automation
+
+
+---
+
+# Author
+
+AI KiCad Automation Project
+
+Built as a learning and portfolio project exploring:
+
+- Artificial Intelligence
+- Model Context Protocol
+- Engineering Automation
+- PCB Design Automation
